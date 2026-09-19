@@ -9,10 +9,12 @@ class EC2Scanner:
     def __init__(self) -> None:
         settings = get_settings()
 
-        self.client = boto3.client(
-            "ec2",
+        session = boto3.Session(
+            profile_name=settings.aws_profile,
             region_name=settings.aws_region,
         )
+
+        self.client = session.client("ec2")
 
     def list_instances(self) -> list[dict[str, Any]]:
         paginator = self.client.get_paginator("describe_instances")

@@ -3,10 +3,13 @@ from unittest.mock import MagicMock, patch
 from app.services.aws.ec2 import EC2Scanner
 
 
-@patch("app.services.aws.ec2.boto3.client")
-def test_list_instances(mock_boto_client: MagicMock) -> None:
+@patch("app.services.aws.ec2.boto3.Session")
+def test_list_instances(mock_session_class: MagicMock) -> None:
+    mock_session = MagicMock()
+    mock_session_class.return_value = mock_session
+
     mock_ec2 = MagicMock()
-    mock_boto_client.return_value = mock_ec2
+    mock_session.client.return_value = mock_ec2
 
     mock_paginator = MagicMock()
     mock_ec2.get_paginator.return_value = mock_paginator
