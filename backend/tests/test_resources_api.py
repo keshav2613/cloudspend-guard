@@ -96,3 +96,44 @@ def test_recommendations_endpoint(mock_scanner_class) -> None:
         data["recommendations"][0]["finding_type"]
         == "UNATTACHED_EBS_VOLUME"
     )
+    
+@patch("app.api.routes.recommendations.CloudWatchService")
+@patch("app.api.routes.recommendations.EC2Scanner")
+@patch("app.api.routes.recommendations.EBSScanner")
+def test_recommendations_endpoint_with_low_cpu_ec2(
+    mock_ebs_scanner_class,
+    mock_ec2_scanner_class,
+    mock_cloudwatch_class,
+) -> None:
+    mock_ebs_scanner_class.return_value.list_volumes.return_value = []
+
+    mock_ec2_scanner_class.return_value.list_instances.return_value = [
+        {
+            "instance_id": "i-lowcpu123",
+            "name": "dev-server",
+            "instance_type": "t3.micro",
+            "state": "running",
+            "availability_zone": "eu-west-1a",
+            "private_ip": "10.0.1.10",
+            "public_ip": None,
+        }
+    ]
+
+    mock_cloudwatch_class.return_value.get_average_cpu_utilization.return_value = 2.4
+
+    response = client.get("/api/v1/recommendations")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["count"] == 1
+    assert data["recommendations"][0]["resource_id"] == "i-lowcpu123"
+    assert (
+        data["recommendations"][0]["finding_type"]
+        == "LOW_EC2_CPU_UTILIZATION"
+    )
+    assert (
+        data["recommendations"][0]["metrics"]["average_cpu_percent"]
+        == 2.4
+    )
