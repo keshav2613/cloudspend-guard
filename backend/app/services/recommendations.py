@@ -22,9 +22,44 @@ class RecommendationEngine:
                             "may be generating unnecessary storage costs."
                         ),
                         "recommendation": (
-                            "Review the volume and delete it if it is no longer required."
+                            "Review the volume and delete it if it is "
+                            "no longer required."
                         ),
                     }
                 )
 
         return recommendations
+
+    def analyze_ec2_instance(
+        self,
+        instance: dict[str, Any],
+        average_cpu: float | None,
+    ) -> dict[str, Any] | None:
+        if instance["state"] != "running":
+            return None
+
+        if average_cpu is None:
+            return None
+
+        if average_cpu >= 5.0:
+            return None
+
+        return {
+            "resource_id": instance["instance_id"],
+            "resource_name": instance.get("name"),
+            "resource_type": "EC2",
+            "finding_type": "LOW_EC2_CPU_UTILIZATION",
+            "severity": "medium",
+            "metrics": {
+                "average_cpu_percent": average_cpu,
+                "period_days": 7,
+            },
+            "message": (
+                "EC2 instance has had low average CPU utilization "
+                "during the analysis period."
+            ),
+            "recommendation": (
+                "Review the instance workload and consider rightsizing "
+                "or stopping it if appropriate."
+            ),
+        }
