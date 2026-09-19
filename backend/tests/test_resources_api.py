@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from decimal import Decimal
 
 from fastapi.testclient import TestClient
 
@@ -66,11 +67,17 @@ def test_list_ec2_resources(mock_scanner_class) -> None:
         ],
     }
 
+@patch("app.api.routes.recommendations.AWSPricingClient")
+@patch("app.api.routes.recommendations.CloudWatchService")
+@patch("app.api.routes.recommendations.EC2Scanner")
 @patch("app.api.routes.recommendations.EBSScanner")
-def test_recommendations_endpoint(mock_scanner_class) -> None:
-    mock_scanner = mock_scanner_class.return_value
-
-    mock_scanner.list_volumes.return_value = [
+def test_recommendations_endpoint(
+    mock_ebs_scanner_class,
+    mock_ec2_scanner_class,
+    mock_cloudwatch_class,
+    mock_pricing_client_class,
+) -> None:
+    mock_ebs_scanner_class.return_value.list_volumes.return_value = [
         {
             "volume_id": "vol-unused123",
             "name": "old-project-volume",
@@ -84,6 +91,12 @@ def test_recommendations_endpoint(mock_scanner_class) -> None:
         }
     ]
 
+    mock_ec2_scanner_class.return_value.list_instances.return_value = []
+
+    mock_pricing_client_class.return_value.get_ebs_price_per_gb_month.return_value = (
+        Decimal("0.08")
+    )
+
     response = client.get("/api/v1/recommendations")
 
     assert response.status_code == 200
@@ -91,11 +104,15 @@ def test_recommendations_endpoint(mock_scanner_class) -> None:
     data = response.json()
 
     assert data["count"] == 1
-    assert data["recommendations"][0]["resource_id"] == "vol-unused123"
-    assert (
-        data["recommendations"][0]["finding_type"]
-        == "UNATTACHED_EBS_VOLUME"
-    )
+
+    recommendation = data["recommendations"][0]
+
+    assert recommendation["resource_id"] == "vol-unused123"
+    assert recommendation["finding_type"] == "UNATTACHED_EBS_VOLUME"
+    assert recommendation["estimated_monthly_cost_usd"] == 8.0
+    assert recommendation["potential_monthly_savings_usd"] == 8.0
+
+    mock_cloudwatch_class.return_value.get_average_cpu_utilization.assert_not_called()
     
 @patch("app.api.routes.recommendations.CloudWatchService")
 @patch("app.api.routes.recommendations.EC2Scanner")

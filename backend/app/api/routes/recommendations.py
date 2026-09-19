@@ -4,6 +4,8 @@ from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
 from app.services.aws.cloudwatch import CloudWatchService
 from app.services.aws.ebs import EBSScanner
 from app.services.aws.ec2 import EC2Scanner
+from app.services.aws.pricing import AWSPricingClient
+from app.services.pricing import PricingService
 from app.services.recommendations import RecommendationEngine
 
 
@@ -17,15 +19,52 @@ router = APIRouter(
 async def list_recommendations() -> dict:
     try:
         engine = RecommendationEngine()
+        pricing_client = AWSPricingClient()
+        pricing_service = PricingService()
+
         recommendations = []
 
         # Analyze EBS volumes
         volumes = EBSScanner().list_volumes()
-        recommendations.extend(
-            engine.analyze_ebs_volumes(volumes)
-        )
 
-        # Analyze EC2 instances using CloudWatch metrics
+        ebs_recommendations = engine.analyze_ebs_volumes(volumes)
+
+        for recommendation in ebs_recommendations:
+            volume = next(
+                (
+                    item
+                    for item in volumes
+                    if item["volume_id"]
+                    == recommendation["resource_id"]
+                ),
+                None,
+            )
+
+            if volume is not None:
+                price_per_gb = (
+                    pricing_client.get_ebs_price_per_gb_month(
+                        volume["volume_type"]
+                    )
+                )
+
+                if price_per_gb is not None:
+                    monthly_cost = (
+                        pricing_service.estimate_ebs_monthly_cost(
+                            volume,
+                            price_per_gb,
+                        )
+                    )
+
+                    recommendation["estimated_monthly_cost_usd"] = float(
+                        monthly_cost
+                    )
+                    recommendation["potential_monthly_savings_usd"] = float(
+                        monthly_cost
+                    )
+
+            recommendations.append(recommendation)
+
+        # Analyze EC2 utilization
         instances = EC2Scanner().list_instances()
         cloudwatch = CloudWatchService()
 
