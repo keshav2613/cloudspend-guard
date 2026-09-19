@@ -65,3 +65,34 @@ def test_list_ec2_resources(mock_scanner_class) -> None:
             }
         ],
     }
+
+@patch("app.api.routes.recommendations.EBSScanner")
+def test_recommendations_endpoint(mock_scanner_class) -> None:
+    mock_scanner = mock_scanner_class.return_value
+
+    mock_scanner.list_volumes.return_value = [
+        {
+            "volume_id": "vol-unused123",
+            "name": "old-project-volume",
+            "volume_type": "gp3",
+            "size_gb": 100,
+            "state": "available",
+            "availability_zone": "eu-west-1a",
+            "encrypted": True,
+            "attached": False,
+            "attached_instance_ids": [],
+        }
+    ]
+
+    response = client.get("/api/v1/recommendations")
+
+    assert response.status_code == 200
+
+    data = response.json()
+
+    assert data["count"] == 1
+    assert data["recommendations"][0]["resource_id"] == "vol-unused123"
+    assert (
+        data["recommendations"][0]["finding_type"]
+        == "UNATTACHED_EBS_VOLUME"
+    )
