@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     api_v1_prefix: str = "/api/v1"
     aws_region: str = "eu-west-1"
+    aws_profile: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
