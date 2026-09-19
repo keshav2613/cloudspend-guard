@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "CloudSpend Guard"
     environment: str = "development"
     api_v1_prefix: str = "/api/v1"
+    aws_region: str = "eu-west-1"
 
     model_config = SettingsConfigDict(
         env_file=".env",
