@@ -16,11 +16,11 @@ class CloudWatchService:
 
         self.client = session.client("cloudwatch")
 
-    def get_average_cpu_utilization(
+    def get_cpu_utilization_history(
         self,
         instance_id: str,
         days: int = 7,
-    ) -> float | None:
+    ) -> list[dict]:
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=days)
 
@@ -39,13 +39,51 @@ class CloudWatchService:
             Statistics=["Average"],
         )
 
-        datapoints = response.get("Datapoints", [])
+        datapoints = response.get(
+            "Datapoints",
+            [],
+        )
 
-        if not datapoints:
+        datapoints.sort(
+            key=lambda item: item["Timestamp"]
+        )
+
+        return [
+            {
+                "timestamp": datapoint[
+                    "Timestamp"
+                ].isoformat(),
+                "average_cpu_percent": round(
+                    datapoint["Average"],
+                    2,
+                ),
+            }
+            for datapoint in datapoints
+        ]
+
+    def get_average_cpu_utilization(
+        self,
+        instance_id: str,
+        days: int = 7,
+    ) -> float | None:
+        history = (
+            self.get_cpu_utilization_history(
+                instance_id,
+                days,
+            )
+        )
+
+        if not history:
             return None
 
         average_cpu = sum(
-            datapoint["Average"] for datapoint in datapoints
-        ) / len(datapoints)
+            datapoint[
+                "average_cpu_percent"
+            ]
+            for datapoint in history
+        ) / len(history)
 
-        return round(average_cpu, 2)
+        return round(
+            average_cpu,
+            2,
+        )
