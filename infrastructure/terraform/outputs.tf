@@ -33,3 +33,23 @@ output "private_subnet_ids" {
     aws_subnet.private_b.id
   ]
 }
+
+output "nat_gateway_id" {
+  description = "NAT Gateway used by private subnets for outbound connectivity"
+  value       = aws_nat_gateway.main.id
+}
+
+output "eks_cluster_name" {
+  description = "Name of the CloudSpend Guard EKS cluster"
+  value       = aws_eks_cluster.main.name
+}
+
+output "eks_cluster_endpoint" {
+  description = "Endpoint of the CloudSpend Guard EKS cluster"
+  value       = aws_eks_cluster.main.endpoint
+}
+
+output "eks_node_group_name" {
+  description = "CloudSpend Guard EKS managed node group"
+  value       = aws_eks_node_group.main.node_group_name
+}

@@ -1,0 +1,47 @@
+backend:
+  replicaCount: 2
+
+  image:
+    repository: 216989097516.dkr.ecr.eu-west-1.amazonaws.com/cloudspend-guard-backend
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+frontend:
+  replicaCount: 2
+
+  image:
+    repository: 216989097516.dkr.ecr.eu-west-1.amazonaws.com/cloudspend-guard-frontend
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
+
+serviceAccount:
+  backend:
+    create: true
+    name: cloudspend-backend
+
+aws:
+  region: eu-west-1
