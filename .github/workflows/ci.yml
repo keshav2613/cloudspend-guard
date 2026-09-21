@@ -42,7 +42,6 @@ jobs:
       - name: Run tests
         run: pytest
 
-
   frontend:
     name: Frontend Build
     runs-on: ubuntu-latest
@@ -71,8 +70,7 @@ jobs:
       - name: Build frontend
         run: npm run build
 
-
-    docker:
+  docker:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
 
@@ -80,7 +78,6 @@ jobs:
       - backend
       - frontend
 
-    # Only push images from main, not from pull requests.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
