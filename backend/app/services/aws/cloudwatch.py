@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import boto3
 
@@ -21,7 +21,7 @@ class CloudWatchService:
         instance_id: str,
         days: int = 7,
     ) -> list[dict]:
-        end_time = datetime.now(timezone.utc)
+        end_time = datetime.now(UTC)
         start_time = end_time - timedelta(days=days)
 
         response = self.client.get_metric_statistics(

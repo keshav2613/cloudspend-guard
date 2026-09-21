@@ -1,5 +1,5 @@
-from fastapi import APIRouter, HTTPException
 from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
+from fastapi import APIRouter, HTTPException
 
 from app.services.aws.cloudwatch import CloudWatchService
 from app.services.aws.ebs import EBSScanner
@@ -7,7 +7,6 @@ from app.services.aws.ec2 import EC2Scanner
 from app.services.aws.pricing import AWSPricingClient
 from app.services.pricing import PricingService
 from app.services.recommendations import RecommendationEngine
-
 
 router = APIRouter(
     prefix="/recommendations",

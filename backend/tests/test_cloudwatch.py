@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 from app.services.aws.cloudwatch import (
@@ -27,7 +27,7 @@ def test_get_average_cpu_utilization(
                     18,
                     10,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 2.0,
             },
@@ -38,7 +38,7 @@ def test_get_average_cpu_utilization(
                     18,
                     11,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 4.0,
             },
@@ -49,7 +49,7 @@ def test_get_average_cpu_utilization(
                     18,
                     12,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 6.0,
             },
@@ -90,7 +90,7 @@ def test_get_cpu_utilization_history(
                     18,
                     12,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 6.25,
             },
@@ -101,7 +101,7 @@ def test_get_cpu_utilization_history(
                     18,
                     10,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 2.15,
             },
@@ -112,7 +112,7 @@ def test_get_cpu_utilization_history(
                     18,
                     11,
                     0,
-                    tzinfo=timezone.utc,
+                    tzinfo=UTC,
                 ),
                 "Average": 4.35,
             },
