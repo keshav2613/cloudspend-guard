@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "github_actions_assume_role" {
       variable = "token.actions.githubusercontent.com:sub"
 
       values = [
-        "repo:keshav2613/cloudspend-guard:ref:refs/heads/main"
+        "repo:keshav2613@76985675/cloudspend-guard@1375665471:ref:refs/heads/main"
       ]
     }
   }

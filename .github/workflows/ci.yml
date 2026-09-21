@@ -87,34 +87,7 @@ jobs:
       # Temporary diagnostic step.
       # Requests a GitHub OIDC token and prints ONLY selected claims.
       # The JWT itself is never printed.
-      - name: Inspect GitHub OIDC claims
-        shell: bash
-        run: |
-          RESPONSE=$(curl -sS \
-            -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=sts.amazonaws.com")
-
-          TOKEN=$(echo "$RESPONSE" | python -c \
-            "import sys,json; print(json.load(sys.stdin)['value'])")
-
-          PAYLOAD=$(echo "$TOKEN" | cut -d '.' -f2)
-
-          python - "$PAYLOAD" <<'PY'
-          import sys
-          import json
-          import base64
-
-          payload = sys.argv[1]
-          payload += "=" * (-len(payload) % 4)
-
-          claims = json.loads(
-              base64.urlsafe_b64decode(payload).decode()
-          )
-
-          for key in ("sub", "aud", "repository", "ref"):
-              print(f"{key}: {claims.get(key)}")
-          PY
-
+      
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
