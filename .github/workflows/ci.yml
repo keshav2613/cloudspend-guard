@@ -87,10 +87,7 @@ jobs:
       # TEMPORARY:
       # Shows the OIDC claims GitHub is sending so we can verify
       # that the AWS IAM trust policy matches the workflow identity.
-      - name: Debug GitHub OIDC claims
-        uses: github/actions-oidc-debugger@main
-        with:
-          audience: sts.amazonaws.com
+    
 
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
