@@ -1,12 +1,11 @@
-from fastapi import APIRouter, HTTPException, Query
 from botocore.exceptions import (
     BotoCoreError,
     ClientError,
     NoCredentialsError,
 )
+from fastapi import APIRouter, HTTPException, Query
 
 from app.services.cloud_analysis import CloudAnalysisService
-
 
 router = APIRouter(
     prefix="/dashboard",

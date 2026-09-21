@@ -1,7 +1,7 @@
-from fastapi import APIRouter, HTTPException
-from app.services.aws.ebs import EBSScanner
 from botocore.exceptions import BotoCoreError, ClientError, NoCredentialsError
+from fastapi import APIRouter, HTTPException
 
+from app.services.aws.ebs import EBSScanner
 from app.services.aws.ec2 import EC2Scanner
 
 router = APIRouter(prefix="/resources", tags=["Resources"])

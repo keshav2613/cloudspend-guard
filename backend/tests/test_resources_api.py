@@ -1,5 +1,5 @@
-from unittest.mock import patch
 from decimal import Decimal
+from unittest.mock import patch
 
 from fastapi.testclient import TestClient
 

@@ -7,7 +7,6 @@ from app.api.routes.recommendations import router as recommendations_router
 from app.api.routes.resources import router as resources_router
 from app.core.config import get_settings
 
-
 settings = get_settings()
 
 app = FastAPI(
