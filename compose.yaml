@@ -1,0 +1,48 @@
+services:
+  backend:
+    build:
+      context: ./backend
+
+    image: cloudspend-guard-api:local
+    container_name: cloudspend-api
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      AWS_PROFILE: ${AWS_PROFILE:-cloudspend-dev}
+      AWS_REGION: ${AWS_REGION:-eu-west-1}
+      AWS_CONFIG_FILE: /home/app/.aws/config
+      AWS_SHARED_CREDENTIALS_FILE: /home/app/.aws/credentials
+
+    volumes:
+      - ${USERPROFILE}/.aws:/home/app/.aws:ro
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000/api/v1}
+
+    image: cloudspend-guard-frontend:local
+    container_name: cloudspend-frontend
+
+    ports:
+      - "3000:80"
+
+    depends_on:
+      backend:
+        condition: service_healthy
