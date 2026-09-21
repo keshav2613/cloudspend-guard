@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Lightbulb,
   Server,
-  Settings,
   WalletCards,
 } from 'lucide-react'
 
@@ -112,13 +111,7 @@ function Sidebar({
       </nav>
 
       <div className="sidebar-bottom">
-        <button
-          className="nav-item"
-          type="button"
-        >
-          <Settings size={19} />
-          Settings
-        </button>
+        
 
         <div className="aws-status">
           <div className="status-header">

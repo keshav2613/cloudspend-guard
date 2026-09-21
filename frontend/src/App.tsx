@@ -104,8 +104,58 @@ function App() {
 
 
   useEffect(() => {
-    loadDashboard()
-  }, [])
+  let cancelled = false
+
+  async function initialLoad() {
+    try {
+      const dashboardData =
+        await getDashboard()
+
+      if (cancelled) {
+        return
+      }
+
+      setSummary(
+        dashboardData.summary,
+      )
+
+      setResources(
+        dashboardData.resources,
+      )
+
+      setRecommendations({
+        count:
+          dashboardData.recommendations.length,
+        recommendations:
+          dashboardData.recommendations,
+      })
+
+      setLastAnalysis(
+        new Date(),
+      )
+    } catch (err) {
+      if (cancelled) {
+        return
+      }
+
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to load dashboard data',
+      )
+    } finally {
+      if (!cancelled) {
+        setLoading(false)
+      }
+    }
+  }
+
+  void initialLoad()
+
+  return () => {
+    cancelled = true
+  }
+}, [])
 
 
   const resourceCount =
