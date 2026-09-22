@@ -1,0 +1,17 @@
+clusterName: cloudspend-guard-eks
+
+serviceAccount:
+  create: true
+  name: aws-load-balancer-controller
+
+region: eu-west-1
+
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
