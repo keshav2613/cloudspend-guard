@@ -84,10 +84,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Temporary diagnostic step.
-      # Requests a GitHub OIDC token and prints ONLY selected claims.
-      # The JWT itself is never printed.
-      
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
