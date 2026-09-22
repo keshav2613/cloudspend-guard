@@ -77,13 +77,13 @@ function ResourceInventory({
       <div className="coverage">
         <div>
           <span>
-            Optimization coverage
+            Analysis scope
           </span>
 
           <strong>
             {loading
               ? '—'
-              : '100%'}
+              : `${ec2Count + ebsCount} resources`}
           </strong>
         </div>
 
@@ -94,7 +94,7 @@ function ResourceInventory({
         <p>
           {loading
             ? 'Analyzing discovered resources'
-            : 'All discovered resources analyzed'}
+            : 'EC2 and EBS resources included in analysis'}
         </p>
       </div>
     </section>

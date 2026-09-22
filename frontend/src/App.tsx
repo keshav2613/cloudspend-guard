@@ -104,58 +104,58 @@ function App() {
 
 
   useEffect(() => {
-  let cancelled = false
+    let cancelled = false
 
-  async function initialLoad() {
-    try {
-      const dashboardData =
-        await getDashboard()
+    async function initialLoad() {
+      try {
+        const dashboardData =
+          await getDashboard()
 
-      if (cancelled) {
-        return
-      }
+        if (cancelled) {
+          return
+        }
 
-      setSummary(
-        dashboardData.summary,
-      )
+        setSummary(
+          dashboardData.summary,
+        )
 
-      setResources(
-        dashboardData.resources,
-      )
+        setResources(
+          dashboardData.resources,
+        )
 
-      setRecommendations({
-        count:
-          dashboardData.recommendations.length,
-        recommendations:
-          dashboardData.recommendations,
-      })
+        setRecommendations({
+          count:
+            dashboardData.recommendations.length,
+          recommendations:
+            dashboardData.recommendations,
+        })
 
-      setLastAnalysis(
-        new Date(),
-      )
-    } catch (err) {
-      if (cancelled) {
-        return
-      }
+        setLastAnalysis(
+          new Date(),
+        )
+      } catch (err) {
+        if (cancelled) {
+          return
+        }
 
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to load dashboard data',
-      )
-    } finally {
-      if (!cancelled) {
-        setLoading(false)
+        setError(
+          err instanceof Error
+            ? err.message
+            : 'Unable to load dashboard data',
+        )
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
       }
     }
-  }
 
-  void initialLoad()
+    void initialLoad()
 
-  return () => {
-    cancelled = true
-  }
-}, [])
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
 
   const resourceCount =
@@ -211,21 +211,21 @@ function App() {
           )}
 
           {activeView === 'resources' ? (
-  <ResourcesView
-    resources={resources}
-  />
-) : activeView === 'findings' ? (
-  <FindingsView
-    findings={findings}
-    loading={loading}
-  />
-) : activeView === 'costs' ? (
-  <CostsView
-    findings={findings}
-    loading={loading}
-  />
-) : (
-   
+            <ResourcesView
+              resources={resources}
+            />
+          ) : activeView === 'findings' ? (
+            <FindingsView
+              findings={findings}
+              loading={loading}
+            />
+          ) : activeView === 'costs' ? (
+            <CostsView
+              findings={findings}
+              loading={loading}
+            />
+          ) : (
+
             <>
               <div className="hero">
                 <div>
@@ -256,15 +256,15 @@ function App() {
                       ? 'Analyzing...'
                       : lastAnalysis
                         ? lastAnalysis
-                            .toLocaleTimeString(
-                              [],
-                              {
-                                hour:
-                                  '2-digit',
-                                minute:
-                                  '2-digit',
-                              },
-                            )
+                          .toLocaleTimeString(
+                            [],
+                            {
+                              hour:
+                                '2-digit',
+                              minute:
+                                '2-digit',
+                            },
+                          )
                         : 'Not analyzed'}
                   </strong>
                 </div>
@@ -301,14 +301,13 @@ function App() {
                     loading
                       ? 'Analyzing resources...'
                       : findingCount ===
-                          0
+                        0
                         ? 'No findings detected'
-                        : `${findingCount} require${
-                            findingCount ===
-                            1
-                              ? 's'
-                              : ''
-                          } attention`
+                        : `${findingCount} require${findingCount ===
+                          1
+                          ? 's'
+                          : ''
+                        } attention`
                   }
                   icon={
                     <Lightbulb
@@ -324,8 +323,8 @@ function App() {
                     loading
                       ? '—'
                       : `$${savings.toFixed(
-                          2,
-                        )}`
+                        2,
+                      )}`
                   }
                   description="Estimated monthly savings"
                   icon={
@@ -337,26 +336,22 @@ function App() {
                 />
 
                 <MetricCard
-                  title="Cloud efficiency"
+                  title="Resources flagged"
                   value={
                     loading
-                      ? 'Analyzing'
-                      : findingCount >
-                          0
-                        ? 'Review'
-                        : 'Optimized'
+                      ? '—'
+                      : findingCount
                   }
                   description={
                     loading
-                      ? 'Scanning cloud resources'
-                      : `${findingCount} optimization ${
-                          findingCount ===
-                          1
-                            ? 'opportunity'
-                            : 'opportunities'
-                        }`
+                      ? 'Analyzing resources...'
+                      : resourceCount === 0
+                        ? 'No resources discovered'
+                        : `${resourceCount} resources analyzed`
                   }
-                  icon={null}
+                  icon={
+                    <Lightbulb size={18} />
+                  }
                   variant="health"
                 />
               </div>
@@ -379,12 +374,11 @@ function App() {
                     <span className="finding-total">
                       {loading
                         ? 'Analyzing'
-                        : `${findings.length} finding${
-                            findings.length ===
-                            1
-                              ? ''
-                              : 's'
-                          }`}
+                        : `${findings.length} finding${findings.length ===
+                          1
+                          ? ''
+                          : 's'
+                        }`}
                     </span>
                   </div>
 
@@ -407,7 +401,7 @@ function App() {
                   {!loading &&
                     !error &&
                     findings.length ===
-                      0 && (
+                    0 && (
                       <div className="finding-state">
                         <div className="success-state-icon">
                           ✓
