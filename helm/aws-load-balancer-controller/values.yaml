@@ -1,10 +1,10 @@
 clusterName: cloudspend-guard-eks
+region: eu-west-1
+vpcId: vpc-0c026d6a9616caeac
 
 serviceAccount:
   create: true
   name: aws-load-balancer-controller
-
-region: eu-west-1
 
 replicaCount: 2
 

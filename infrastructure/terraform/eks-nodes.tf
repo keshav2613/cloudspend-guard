@@ -72,3 +72,4 @@ resource "aws_eks_node_group" "main" {
     Name = "${var.project_name}-eks-nodes"
   })
 }
+
