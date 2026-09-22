@@ -1,13 +1,20 @@
 {{- if .Values.ingress.enabled }}
+
+# Backend Ingress
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: cloudspend-guard
+  name: cloudspend-guard-backend
   namespace: cloudspend
   labels:
     app.kubernetes.io/name: cloudspend-guard
   annotations:
-    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    alb.ingress.kubernetes.io/group.name: cloudspend-guard
+    alb.ingress.kubernetes.io/group.order: "10"
+    alb.ingress.kubernetes.io/healthcheck-path: /api/v1/health
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
@@ -21,6 +28,28 @@ spec:
                 port:
                   number: 8000
 
+---
+
+# Frontend Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudspend-guard-frontend
+  namespace: cloudspend
+  labels:
+    app.kubernetes.io/name: cloudspend-guard
+  annotations:
+    alb.ingress.kubernetes.io/group.name: cloudspend-guard
+    alb.ingress.kubernetes.io/group.order: "20"
+    alb.ingress.kubernetes.io/healthcheck-path: /
+    {{- with .Values.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - http:
+        paths:
           - path: /
             pathType: Prefix
             backend:
@@ -28,4 +57,5 @@ spec:
                 name: cloudspend-frontend
                 port:
                   number: 80
+
 {{- end }}
