@@ -367,6 +367,75 @@ docker compose up --build
 
 Docker Compose runs the frontend and backend locally while keeping the services containerized.
 
+### Local URLs and Verification
+
+- Frontend: [http://localhost:3000](http://localhost:3000)
+- API health: [http://localhost:8000/api/v1/health](http://localhost:8000/api/v1/health)
+- Dashboard API: [http://localhost:8000/api/v1/dashboard](http://localhost:8000/api/v1/dashboard)
+
+Verify startup and inspect the API health endpoint:
+
+```bash
+docker compose ps
+curl --fail http://localhost:8000/api/v1/health
+docker compose logs --tail=100 backend
+```
+
+The frontend waits for the backend's health check before starting. A successful health response confirms the API is reachable; resource discovery and recommendations also require working AWS credentials and permissions.
+
+### AWS Profile and Credential Mount
+
+The current Compose configuration defaults to the `cloudspend-dev` AWS profile and `eu-west-1` region. It mounts `${USERPROFILE}/.aws` read-only inside the backend container.
+
+On Windows, `USERPROFILE` normally points to your user directory. On Linux or macOS, set it explicitly before running Compose:
+
+```bash
+export USERPROFILE="$HOME"
+export AWS_PROFILE="cloudspend-dev"
+export AWS_REGION="eu-west-1"
+docker compose up --build
+```
+
+The selected profile must exist in the mounted AWS configuration and credentials files. If the AWS CLI is installed, verify that profile before scanning:
+
+```bash
+aws sts get-caller-identity --profile cloudspend-dev
+```
+
+Keep credentials outside the repository. Health checks alone do not verify AWS API access.
+
+### Common Local Issues
+
+| Symptom | Check |
+|---|---|
+| Backend cannot find the AWS profile | Confirm `AWS_PROFILE`, the credential files and the `USERPROFILE` mount path. |
+| AWS returns `AccessDenied` | Review the permissions for the failing EC2, CloudWatch or Pricing API operation. |
+| Frontend does not start | Inspect `docker compose ps` and backend logs; startup depends on backend health. |
+| Port 3000 or 8000 is already in use | Stop the conflicting process or adjust the published ports and frontend API URL together. |
+
+### Run the Same Application Checks as CI
+
+Backend checks (CI uses Python 3.12):
+
+```bash
+cd backend
+python -m pip install -e ".[dev]"
+ruff check .
+pytest
+```
+
+Frontend checks (CI uses Node.js 22):
+
+```bash
+cd frontend
+npm ci
+npm run lint
+npm run build
+```
+
+Run each command group from the repository root in a separate terminal, or return to the root before switching directories. These commands validate the application locally; they do not provision AWS infrastructure or publish images.
+
+
 ---
 
 ## 📁 Repository Structure
